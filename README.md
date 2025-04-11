@@ -49,6 +49,12 @@ lib_deps =
 - ESP32 WROOM dev board (esp32dev)  
 - SSD1306 OLED display, 128x32, I²C (address: 0x3C)  
 
+## Minimum Requirements
+- ArduinoJson >= 6.18.0
+- Adafruit BusIO >= 1.17.0
+- Adafruit GFX Library >= 1.11.11
+- Adafruit SSD1306 >= 2.5.13
+
 ## Troubleshooting
 - **Nothing on screen:**  
   - Check I²C wiring and display address (0x3C)  
