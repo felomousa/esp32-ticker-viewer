@@ -11,14 +11,15 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-const char* ssid     = "";
-const char* password = "";
+const char* ssid     = "felo";
+const char* password = "something_secure_idk";
 const char* endpoint = "https://api.felomousa.com/finance";
 
 
 void initDisplay() {
-  display.begin(SSD1306_SWITCHCAPVCC);
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
 }
 
 void connectWiFi() {
@@ -33,14 +34,14 @@ void connectWiFi() {
 
 
 void updateDisplay(float price, float change) {
+  display.clearDisplay();
   char line1[16], line2[16];
   snprintf(line1, sizeof(line1), "$%.2f", price);
   if (change >= 0) // if price change >0, show with "+", otherwise use "-"
     snprintf(line2, sizeof(line2), "+$%.2f", change);
   else
     snprintf(line2, sizeof(line2), "-$%.2f", -change);
-  // Serial.println(line1); // print current price 
-  // Serial.println(line2); // print price change
+  
   display.setTextSize(2);
   display.setCursor(22, 3);
   display.print(line1);
@@ -48,24 +49,33 @@ void updateDisplay(float price, float change) {
   display.setTextSize(1);
   display.setCursor(46, 21);
   display.print(line2);
+  //Serial.print("displayed");
 
   display.display();
 }
 
 void getData() {
-  if(WiFi.status() != WL_CONNECTED) return;
+  if (WiFi.status() != WL_CONNECTED)
+    return;
 
-  HTTPClient http; http.begin(endpoint);
+  HTTPClient http;
+  http.begin(endpoint);
   int code = http.GET();
-
-  if(code == HTTP_CODE_OK) {
+  if (code == HTTP_CODE_OK) {
     String payload = http.getString();
     StaticJsonDocument<256> doc;
-    if(!deserializeJson(doc, payload))
-      updateDisplay(doc["current_price"].as<float>(), doc["daily_change"].as<float>());
-    else Serial.println("json parse error");
+    if (!deserializeJson(doc, payload)) {
+      float price = doc["current_price"];
+      float change = doc["daily_change"];
+      //Serial.print(change);
+      //Serial.print(price);
+      updateDisplay(price, change);
+    } else {
+      Serial.println("json parse error");
+    }
   } else {
-    Serial.print("http error: "); Serial.println(http.errorToString(code));
+    Serial.print("http error: ");
+    Serial.println(http.errorToString(code));
   }
   http.end();
 }
@@ -81,3 +91,4 @@ void loop() {
   getData();
   delay(5000);
 }
+
