@@ -14,29 +14,20 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   display.begin(SSD1306_SWITCHCAPVCC);
-
   display.clearDisplay();
-  display.setTextSize(4);
-  display.setTextColor(SSD1306_WHITE);
 
-  display.setCursor(0, 2); // vertically centered
-
-  display.display();
   delay(1000);
-
   Serial.println("setup donzo");
 }
 
 void loop() {
-  display.setTextColor(SSD1306_INVERSE);
-
   display.clearDisplay();
   display.setCursor(0, 2); // vertically centered
 
   display.print(counter);
   display.display();
   //Serial.println(counter);
-  delay(100);
   counter++;
   if (counter > 100) counter = 1;
+  delay(100);
 }
